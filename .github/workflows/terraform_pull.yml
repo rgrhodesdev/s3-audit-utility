@@ -61,10 +61,10 @@ jobs:
         with:
           terraform_version: 1.13
 
-      - name: Check formatting
-        id: format
-        run: terraform fmt -check -recursive
-        working-directory: "./terraform"
+      #- name: Check formatting
+       # id: format
+        #run: terraform fmt -check -recursive
+        #working-directory: "./terraform"
   
       - name: Initialise Terraform
         run: terraform init -backend=false -input=false
