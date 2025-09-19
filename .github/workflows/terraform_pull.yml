@@ -82,7 +82,7 @@ jobs:
       - iac-audit
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
-    environment: ${{ (github.ref_name == 'develop' && 'DEV') }} #${{ (github.ref_name == 'main' && 'PRD') || 
+    environment: ${{ github.base_ref == 'develop' && 'DEV' }} #${{ (github.base_ref == 'main' && 'PRD') || 
     steps:
       - name: checkout code
         uses: actions/checkout@v4
