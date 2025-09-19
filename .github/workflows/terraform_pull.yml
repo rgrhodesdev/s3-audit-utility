@@ -82,7 +82,7 @@ jobs:
       - iac-audit
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
-    environment: (github.ref_name == 'develop' && 'DEV') #${{ (github.ref_name == 'main' && 'PRD') || 
+    environment: ${{ (github.ref_name == 'develop' && 'DEV') }} #${{ (github.ref_name == 'main' && 'PRD') || 
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
           aws-region: eu-west-1
       
       - name: Prepare Terraform Environment Config Files
-        run: ./scripts/tf-prepare-environment.sh ((github.base_ref == 'develop' && 'DEV') #$ {{ ((github.base_ref == 'main' && 'PRD') || 
+        run: ./scripts/tf-prepare-environment.sh ${{ (github.ref_name == 'develop' && 'DEV') }} #$ {{ ((github.base_ref == 'main' && 'PRD') || 
       - name: Initialise Terraform
         id: init
         run: terraform init -backend-config=backend.conf -input=false
