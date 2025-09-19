@@ -3,9 +3,9 @@ name: Pull Request IaC Checks
 on:
   workflow_dispatch:
     
-  pull_request:
-    branches: 
-      - develop
+  #pull_request:
+   # branches: 
+    #  - develop
     #  - main
     #paths:
      # - '.github/workflows/iac_pull.yml'
