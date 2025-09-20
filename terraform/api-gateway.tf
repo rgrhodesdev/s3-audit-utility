@@ -1,4 +1,4 @@
-resource "aws_api_gateway_rest_api" "utils_api" {
+resource "aws_api_gateway_rest_api" "utils" {
   name        = "${var.env}-S3-Utility-API"
   description = "API Endpoint for S3 Audit in the ${var.env} environment"
 
@@ -15,14 +15,14 @@ resource "aws_api_gateway_deployment" "deployment" {
     aws_api_gateway_integration.lambda_integration
   ]
 
-  rest_api_id = aws_api_gateway_rest_api.utils_api.id
+  rest_api_id = aws_api_gateway_rest_api.utils.id
 
 }
 
 resource "aws_api_gateway_stage" "deployment" {
 
   deployment_id = aws_api_gateway_deployment.deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.utils_api.id
+  rest_api_id   = aws_api_gateway_rest_api.utils.id
   stage         = var.env
 
 }
