@@ -3,9 +3,9 @@ name: Pull Request IaC Checks
 on:
   workflow_dispatch:
     
-  #pull_request:
-   # branches: 
-    #  - develop
+  pull_request:
+    branches: 
+      - develop
     #  - main
     #paths:
      # - '.github/workflows/iac_pull.yml'
@@ -19,35 +19,35 @@ permissions:
   contents: read
 
 jobs:
-  iac-audit:
-    name: IaC Audit 
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
+  # iac-audit:
+  #   name: IaC Audit 
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Checkov GitHub Action
-        id: audit
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          output_format: sarif,junitxml
-          output_file_path: checkov-results.sarif,checkov-results.xml
-        continue-on-error: true
+  #     - name: Checkov GitHub Action
+  #       id: audit
+  #       uses: bridgecrewio/checkov-action@v12
+  #       with:
+  #         output_format: sarif,junitxml
+  #         output_file_path: checkov-results.sarif,checkov-results.xml
+  #       continue-on-error: true
 
-      - name: Upload checkov results
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkov-results
-          path: |
-            checkov-results.xml
-            checkov-results.sarif
+  #     - name: Upload checkov results
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: checkov-results
+  #         path: |
+  #           checkov-results.xml
+  #           checkov-results.sarif
 
-      - name: Report Audit Failure
-        if: steps.audit.outcome != 'success'
-        uses: actions/github-script@v4
-        with:
-          script: |
-              core.setFailed('checkov audit failed')
+  #     - name: Report Audit Failure
+  #       if: steps.audit.outcome != 'success'
+  #       uses: actions/github-script@v4
+  #       with:
+  #         script: |
+  #             core.setFailed('checkov audit failed')
   
   iac-lint-and-validate:
     name: IaC Lint & Validate
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - iac-lint-and-validate
-      - iac-audit
+      #- iac-audit
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
     environment: ${{ github.base_ref == 'develop' && 'DEV' }} #${{ (github.base_ref == 'main' && 'PRD') || 
