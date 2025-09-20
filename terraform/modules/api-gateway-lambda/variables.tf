@@ -8,7 +8,17 @@ variable "http_method" {
   type        = string
 }
 
+variable "rest_api_id" {
+  description = "The ID of the REST API"
+  type        = string
+}
+
+variable "root_resource_id" {
+  description = "The ID of the Root Resource under which to create the new API"
+  type        = string
+}
+
 variable "path_part" {
-  description = "The vlaue of the API path under the root resource"
+  description = "The value of the API path under the root resource"
   type        = string
 }
