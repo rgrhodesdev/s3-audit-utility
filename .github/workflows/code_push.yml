@@ -43,10 +43,12 @@ jobs:
       - name: Build TypeScript
         run: npm run build --prefix
 
+      - name: Install Node DEpendencies to dist
+        run: npm install --prefix "dist" --production
+        working-directory: ./dist
+
       - name: Zip function code
-        run: |
-          npm install --prefix "dist" --production
-          zip -vr s3-audit-service.zip .
+        run: zip -vr s3-audit-service.zip .
         working-directory: ./dist
 
       - name: Configure AWS Credentials
