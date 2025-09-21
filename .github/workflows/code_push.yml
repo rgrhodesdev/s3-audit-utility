@@ -50,7 +50,6 @@ jobs:
           zip -r s3-audit-service.zip .
         working-directory: ./dist
 
-      # Configure AWS credentials using OIDC. This requires prior setup in your AWS account.
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -58,6 +57,5 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: eu-west-1
 
-      # Upload the zip file to an S3 bucket
       - name: Upload to S3
         run: aws s3 cp ./dist/s3-audit-service.zip s3://${{ github.base_ref == 'develop' && 'dev' }}-${{ secrets.S3_BUCKET_NAME }}/s3-audit-service.zip
