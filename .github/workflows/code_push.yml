@@ -47,8 +47,8 @@ jobs:
         run: |
           npm install --prefix "dist" --production
           zip -vr s3-audit-service.zip .
-        working-directory: ./dist
-
+        working-directory: s3-audit-service
+        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
