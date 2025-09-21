@@ -1,17 +1,14 @@
 name: Pull Request IaC Checks
 
 on:
-  workflow_dispatch:
-    
+ # workflow_dispatch:
   pull_request:
     branches: 
       - develop
-    #  - main
-    #paths:
-     # - '.github/workflows/iac_pull.yml'
-      #- 'scripts/iac-*'
-      #- 'scripts/tf-*'
-      #- 'iac-scripts/**'
+      - main
+    paths:
+      - '.github/workflows/terraform_pull.yml'
+      - 'terraform/**'
 
 permissions:
   id-token: write
@@ -82,7 +79,7 @@ jobs:
       #- iac-audit
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
-    environment: ${{ github.base_ref == 'develop' && 'DEV' }} #${{ (github.base_ref == 'main' && 'PRD') || 
+    environment: ${{ (github.base_ref == 'main' && 'PRD') || (github.base_ref == 'develop' && 'DEV') }}
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -100,7 +97,7 @@ jobs:
           aws-region: eu-west-1
       
       - name: Prepare Terraform Environment Config Files
-        run: ./scripts/tf-prepare-environment.sh ${{ github.base_ref == 'develop' && 'DEV' }} #$ {{ ((github.base_ref == 'main' && 'PRD') || 
+        run: ./scripts/tf-prepare-environment.sh ${{ (github.base_ref == 'main' && 'PRD') || (github.base_ref == 'develop' && 'DEV') }} 
       - name: Initialise Terraform
         id: init
         run: terraform init -backend-config=backend.conf -input=false
@@ -123,7 +120,7 @@ jobs:
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
   
-            <details><summary>Show Plan for ${{ (github.base_ref == 'main' && 'PRD') || (github.base_ref == 'develop' && 'DEV Non-Live') }} Deployment</summary>
+            <details><summary>Show Plan for ${{ (github.base_ref == 'main' && 'Prod') || (github.base_ref == 'develop' && 'DEV Non-Live') }} Deployment</summary>
   
             \`\`\`\n
             ${process.env.PLAN}

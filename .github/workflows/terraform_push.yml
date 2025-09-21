@@ -1,20 +1,15 @@
 name: Deployment
 
 on:
-  workflow_dispatch:
-
-#on:
- # push:
-  #  branches: 
-   #   - develop
-    #  - test
-     # - prelive
-      #- main
-    #paths:
-     # - '.github/workflows/iac_pull.yml'
-      #- 'scripts/iac-*'
-      #- 'scripts/tf-*'
-      #- 'iac-scripts/**'
+  push:
+    branches: 
+      - develop
+      - test
+      - prelive
+      - main
+    paths:
+      - '.github/workflows/iac_pull.yml'
+      - 'terraform/**'
 
 permissions:
   id-token: write
