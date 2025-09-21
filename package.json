@@ -1,5 +1,5 @@
 {
-  "name": "lambda-function",
+  "name": "s3-audit-service",
   "version": "1.0.0",
   "description": "S3 Audit TypeScript AWS Lambda function.",
   "main": "dist/index.js",
