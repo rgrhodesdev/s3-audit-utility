@@ -1,19 +1,7 @@
-name: Lambda Code Push
+name: S3 Audit Service Build and Deploy
+
 on:
   workflow_dispatch:
-
-#on:
- # push:
-  #  branches: 
-   #   - develop
-    #  - test
-     # - prelive
-      #- main
-    #paths:
-     # - '.github/workflows/iac_pull.yml'
-      #- 'scripts/iac-*'
-      #- 'scripts/tf-*'
-      #- 'iac-scripts/**'
 
 permissions:
   id-token: write
@@ -26,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
-    environment: DEV #${{ (github.base_ref == 'main' && 'PRD') || 
+    environment: ${{ (github.ref_name == 'main' && 'PRD') || (github.ref_name == 'develop' && 'DEV') }} 
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -57,15 +44,15 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: eu-west-1
 
-      #- name: Upload to S3
-       # run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
+      - name: Upload to S3
+        run: aws s3 cp ./dist/s3-audit.zip s3://${{ vars.environment }}-s3-audit-service-deployment/s3-audit.zip
 
       - name: Update Lambda code and publish new version
         id: update_code
         run: |
-          VERSION=$(aws lambda update-function-code --function-name dev-s3-audit --s3-bucket dev-s3-audit-service-deployment --s3-key s3-audit.zip --publish | jq -r .Version)
+          VERSION=$(aws lambda update-function-code --function-name ${{ vars.environment }}-s3-audit --s3-bucket ${{ vars.environment }}-s3-audit-service-deployment --s3-key s3-audit.zip --publish | jq -r .Version)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update alias to new version
         run: |
-          aws lambda update-alias --function-name dev-s3-audit --name main --function-version ${{ steps.update_code.outputs.version }}
+          aws lambda update-alias --function-name ${{ vars.environment }}-s3-audit --name main --function-version ${{ steps.update_code.outputs.version }}
