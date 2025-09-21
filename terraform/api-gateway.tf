@@ -1,10 +1,32 @@
-resource "aws_api_gateway_rest_api" "utils_api" {
-  name        = "S3-Utility-API"
-  description = "API Endpoint for S3 Audit Utility APIs"
+resource "aws_api_gateway_rest_api" "utils" {
+  name        = "${var.env}-S3-Utility-API"
+  description = "API Endpoint for S3 Audit in the ${var.env} environment"
+
+  lifecycle {
+
+    create_before_destroy = true
+
+  }
+
+  endpoint_configuration {
+
+    types = ["REGIONAL"]
+
+  }
+
 }
 
-resource "aws_api_gateway_resource" "api_root" {
-  rest_api_id = aws_api_gateway_rest_api.my_api.id
-  parent_id   = aws_api_gateway_rest_api.my_api.root_resource_id
-  path_part   = v1
+resource "aws_api_gateway_deployment" "deployment" {
+
+  rest_api_id = aws_api_gateway_rest_api.utils.id
+
 }
+
+resource "aws_api_gateway_stage" "deployment" {
+
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.utils.id
+  stage_name    = var.env
+
+}
+

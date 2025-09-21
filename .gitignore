@@ -18,6 +18,7 @@ override.tf.json
 
 # Ignore transient lock info files created by terraform apply
 .terraform.tfstate.lock.info
+.terraform.lock.hcl
 
 # Include override files you do wish to add to version control using negated pattern
 # !example_override.tf
@@ -28,3 +29,17 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+
+#Terrafrom other
+terraform/planfile
+
+
+# Node
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
+dist
+dist
