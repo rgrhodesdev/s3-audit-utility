@@ -60,10 +60,7 @@ jobs:
       - name: Upload to S3
         run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
 
-      - name: Deploy Lambda function
-        uses: aws-actions/aws-lambda-deploy@v1
-        with:
-          function-name: dev-s3-audit
-          runtime: nodejs22.x
-          s3-bucket: dev-s3-audit-service-deployment
-          s3-key: s3-audit.zip
+      - name: Update Lambda code and publish new version
+        run: |
+          VERSION=$(aws lambda update-function-code --function-name dev-s3-audit --s3-bucket dev-s3-audit-service-deployment --s3-key s3-audit.zip --publish | jq -r .Version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
