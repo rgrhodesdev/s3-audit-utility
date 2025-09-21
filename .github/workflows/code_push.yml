@@ -57,8 +57,8 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: eu-west-1
 
-      - name: Upload to S3
-        run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
+      #- name: Upload to S3
+       # run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
 
       - name: Update Lambda code and publish new version
         run: |
