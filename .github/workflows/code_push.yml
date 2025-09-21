@@ -47,7 +47,7 @@ jobs:
         run: |
           npm install --production --prefix ./s3-audit-service
           zip -r s3-audit-service.zip .
-        working-directory: ./dist
+        working-directory: ./s3-audit-service/dist
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -57,4 +57,4 @@ jobs:
           aws-region: eu-west-1
 
       - name: Upload to S3
-        run: aws s3 cp ./dist/s3-audit-service.zip s3://dev-${{ secrets.S3_BUCKET_NAME }}/s3-audit-service.zip
+        run: aws s3 cp ./s3-audit-service/dist/s3-audit-service.zip s3://dev-${{ secrets.S3_BUCKET_NAME }}/s3-audit-service.zip
