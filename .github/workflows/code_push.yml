@@ -45,8 +45,7 @@ jobs:
 
       - name: Zip function code
         run: |
-          npm install --production --prefix ./s3-audit-service
-          zip -r s3-audit-service.zip .
+          npm install --production
         working-directory: ./s3-audit-service/dist
 
       - name: Configure AWS Credentials
