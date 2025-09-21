@@ -1,4 +1,4 @@
-name: Pull Request IaC Checks
+name: Pull Request Terraform Checks
 
 on:
  # workflow_dispatch:
