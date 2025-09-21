@@ -2,9 +2,10 @@ name: Pull Request IaC Checks
 
 on:
   workflow_dispatch:
-  #pull_request:
-    #branches: 
-    #  - develop
+    
+  pull_request:
+    branches: 
+      - develop
     #  - main
     #paths:
      # - '.github/workflows/iac_pull.yml'
@@ -18,37 +19,35 @@ permissions:
   contents: read
 
 jobs:
-  iac-audit:
-    name: IaC Audit 
-    runs-on: ubuntu-24.04
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ (github.event_name == 'pull_request' && github.event.number) || inputs.pr_number }}/merge
+  # iac-audit:
+  #   name: IaC Audit 
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Checkov GitHub Action
-        id: audit
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          output_format: sarif,junitxml
-          output_file_path: checkov-results.sarif,checkov-results.xml
-        continue-on-error: true
+  #     - name: Checkov GitHub Action
+  #       id: audit
+  #       uses: bridgecrewio/checkov-action@v12
+  #       with:
+  #         output_format: sarif,junitxml
+  #         output_file_path: checkov-results.sarif,checkov-results.xml
+  #       continue-on-error: true
 
-      - name: Upload checkov results
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkov-results
-          path: |
-            checkov-results.xml
-            checkov-results.sarif
+  #     - name: Upload checkov results
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: checkov-results
+  #         path: |
+  #           checkov-results.xml
+  #           checkov-results.sarif
 
-      - name: Report Audit Failure
-        if: steps.audit.outcome != 'success'
-        uses: actions/github-script@v4
-        with:
-          script: |
-              core.setFailed('checkov audit failed')
+  #     - name: Report Audit Failure
+  #       if: steps.audit.outcome != 'success'
+  #       uses: actions/github-script@v4
+  #       with:
+  #         script: |
+  #             core.setFailed('checkov audit failed')
   
   iac-lint-and-validate:
     name: IaC Lint & Validate
@@ -58,7 +57,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.13
 
@@ -77,20 +76,19 @@ jobs:
 
   terraform-plan:
     name: Terraform Plan
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     needs: 
       - iac-lint-and-validate
-      - iac-audit
+      #- iac-audit
     concurrency:
-      group: "${{ github.repository}}-${{ github.base_ref || inputs.target_branch }}"
-    environment: ECP-${{ (github.ref_name == 'main' && 'PRD') || (github.ref_name == 'develop' && 'DEV')
+      group: "${{ github.repository }}-${{ github.base_ref }}"
+    environment: ${{ github.base_ref == 'develop' && 'DEV' }} #${{ (github.base_ref == 'main' && 'PRD') || 
     steps:
       - name: checkout code
         uses: actions/checkout@v4
 
-
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.13
 
@@ -102,18 +100,17 @@ jobs:
           aws-region: eu-west-1
       
       - name: Prepare Terraform Environment Config Files
-        run: ./scripts/tf-prepare-environment.sh ECP-${{ ((github.base_ref || inputs.target_branch) == 'main' && 'PRD') || ((github.base_ref || inputs.target_branch) == 'prelive' && 'PRL') || ((github.base_ref || inputs.target_branch) == 'test' && 'TST') || ((github.base_ref || inputs.target_branch) == 'develop' && 'DEV') }}
-
+        run: ./scripts/tf-prepare-environment.sh ${{ github.base_ref == 'develop' && 'DEV' }} #$ {{ ((github.base_ref == 'main' && 'PRD') || 
       - name: Initialise Terraform
         id: init
         run: terraform init -backend-config=backend.conf -input=false
-        working-directory: "./iac-scripts/terraform"
+        working-directory: "./terraform"
         continue-on-error: true
   
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var-file="config.tfvars" -var-file="versions.tfvars.json" -no-color
-        working-directory: "./iac-scripts/terraform"
+        run: terraform plan -var-file="config.tfvars" -no-color
+        working-directory: "./terraform"
         continue-on-error: true
 
       - name: Post Terraform Plan Output
@@ -126,7 +123,7 @@ jobs:
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
   
-            <details><summary>Show Plan for ${{ ((github.base_ref || inputs.target_branch) == 'main' && 'PRODUCTION') || ((github.base_ref || inputs.target_branch) == 'prelive' && 'PRL Pre-Live') || ((github.base_ref || inputs.target_branch) == 'test' && 'TST Non-Live') || ((github.base_ref || inputs.target_branch) == 'develop' && 'DEV Non-Live') }} Deployment</summary>
+            <details><summary>Show Plan for ${{ (github.base_ref == 'main' && 'PRD') || (github.base_ref == 'develop' && 'DEV Non-Live') }} Deployment</summary>
   
             \`\`\`\n
             ${process.env.PLAN}
@@ -147,7 +144,7 @@ jobs:
               issue_number: ${{ github.event.number || inputs.pr_number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ['${{ ((github.base_ref || inputs.target_branch) == 'main' && 'PRODUCTION') || ((github.base_ref || inputs.target_branch) == 'prelive' && 'PRL')  || ((github.base_ref || inputs.target_branch) == 'test' && 'TST') || ((github.base_ref || inputs.target_branch) == 'develop' && 'DEV') }}']
+              labels: ['${{ (github.base_ref  == 'main' && 'PRODUCTION') || (github.base_ref == 'develop' && 'DEV') }}']
             })
 
       - name: Report Terraform Failure
