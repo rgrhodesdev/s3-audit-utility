@@ -17,7 +17,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
 
   // Determine the user's name from a query string parameter.
   // If the 'name' parameter is not provided, default to 'World'.
-  const name = event.queryStringParameters?.name || 'World';
+  const name = event.queryStringParameters?.name || 'Leeds';
 
   // Construct the response body as a JSON object.
   const responseBody = {
