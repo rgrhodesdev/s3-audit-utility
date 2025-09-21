@@ -22,3 +22,8 @@ variable "path_part" {
   description = "The value of the API path under the root resource"
   type        = string
 }
+
+variable "lambda_invoke_arn" {
+  description = "The value of the lambda invoke arn"
+  type        = string
+}

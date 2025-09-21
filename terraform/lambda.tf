@@ -29,7 +29,7 @@ resource "aws_lambda_alias" "s3_audit_alias" {
 }
 
 resource "aws_iam_role" "s3_audit_role" {
-  name = "lambda-role"
+  name = "${var.env}-s3-audit-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -43,4 +43,18 @@ resource "aws_iam_role" "s3_audit_role" {
     }
   ]
 })
+}
+
+resource "aws_iam_role_policy_attachment" "s3_audit_lambda" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role = aws_iam_role.s3_audit_role.name
+}
+
+resource "aws_lambda_permission" "s3_audit_api_gateway" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.s3_audit_lambda.function_name
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.utils.execution_arn}/*/*/*"
 }
