@@ -43,9 +43,9 @@ jobs:
       - name: Build TypeScript
         run: npm run build --prefix
 
-      - name: Install Node DEpendencies to dist
+      - name: Install Node Dependencies to dist
         run: npm install --prefix "dist" --production
-        working-directory: ./dist
+
 
       - name: Zip function code
         run: zip -vr s3-audit-service.zip .
