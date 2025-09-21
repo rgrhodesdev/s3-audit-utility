@@ -47,7 +47,7 @@ jobs:
         run: mv node_modules dist/node_modules
 
       - name: Zip function code
-        run: zip -r s3-audit-service.zip .
+        run: zip -r s3-audit.zip .
         working-directory: ./dist
 
       - name: Configure AWS Credentials
@@ -58,4 +58,12 @@ jobs:
           aws-region: eu-west-1
 
       - name: Upload to S3
-        run: aws s3 cp ./dist/s3-audit-service.zip s3://dev-s3-audit-service/s3-audit-service.zip
+        run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
+
+      - name: Deploy Lambda function
+        uses: aws-actions/aws-lambda-deploy@v1
+        with:
+          function-name: dev-s3-audit
+          runtime: nodejs22.x
+          s3-bucket: dev-s3-audit-service-deployment
+          s3-key: s3-audit.zip
