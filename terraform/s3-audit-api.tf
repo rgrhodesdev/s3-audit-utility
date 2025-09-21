@@ -8,5 +8,7 @@ module "api_s3_audit_post" {
   rest_api_id      = aws_api_gateway_rest_api.utils.id
   root_resource_id = aws_api_gateway_rest_api.utils.root_resource_id
 
+  lambda_invoke_arn = aws_lambda_function.s3_audit_lambda.invoke_arn
+
 
 }

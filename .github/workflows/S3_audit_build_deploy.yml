@@ -1,0 +1,58 @@
+name: S3 Audit Service Build and Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+
+  build-and-upload:
+    name: Code Upload
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "${{ github.repository }}-${{ github.base_ref }}"
+    environment: ${{ (github.ref_name == 'main' && 'PRD') || (github.ref_name == 'develop' && 'DEV') }} 
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+
+      - name: Install dependencies
+        run: npm install 
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Move node dependencies to dist
+        run: mv node_modules dist/node_modules
+
+      - name: Zip function code
+        run: zip -r s3-audit.zip .
+        working-directory: ./dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: eu-west-1
+
+      - name: Upload to S3
+        run: aws s3 cp ./dist/s3-audit.zip s3://${{ vars.environment }}-s3-audit-service-deployment/s3-audit.zip
+
+      - name: Update Lambda code and publish new version
+        id: update_code
+        run: |
+          VERSION=$(aws lambda update-function-code --function-name ${{ vars.environment }}-s3-audit --s3-bucket ${{ vars.environment }}-s3-audit-service-deployment --s3-key s3-audit.zip --publish | jq -r .Version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update alias to new version
+        run: |
+          aws lambda update-alias --function-name ${{ vars.environment }}-s3-audit --name main --function-version ${{ steps.update_code.outputs.version }}
