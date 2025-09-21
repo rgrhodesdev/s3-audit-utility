@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "./s3-audit-service/src",
+    "outDir": "./s3-audit-service/dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
