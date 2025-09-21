@@ -45,7 +45,7 @@ jobs:
 
       - name: Zip function code
         run: |
-          npm install --production
+          npm install --prefix "dist" --production
           zip -vr s3-audit-service.zip .
         working-directory: ./dist
 
