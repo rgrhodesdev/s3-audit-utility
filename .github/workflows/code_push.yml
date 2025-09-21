@@ -47,7 +47,7 @@ jobs:
         run: mv node_modules dist/node_modules
 
       - name: Zip function code
-        run: zip -vr s3-audit-service.zip .
+        run: zip -r s3-audit-service.zip .
         working-directory: ./dist
 
       - name: Configure AWS Credentials
