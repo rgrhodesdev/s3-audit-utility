@@ -61,6 +61,11 @@ jobs:
        # run: aws s3 cp ./dist/s3-audit.zip s3://dev-s3-audit-service-deployment/s3-audit.zip
 
       - name: Update Lambda code and publish new version
+        id: update_code
         run: |
           VERSION=$(aws lambda update-function-code --function-name dev-s3-audit --s3-bucket dev-s3-audit-service-deployment --s3-key s3-audit.zip --publish | jq -r .Version)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update alias to new version
+        run: |
+          aws lambda update-alias --function-name dev-s3-audit --name main --function-version ${{ steps.update_code.outputs.version }}
