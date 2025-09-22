@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform-audit:
+  iac-audit:
     name: IaC Audit 
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - iac-lint-and-validate
-      #- iac-audit
+      - iac-audit
     concurrency:
       group: "${{ github.repository }}-${{ github.base_ref }}"
     environment: ${{ (github.base_ref == 'main' && 'PRD') || (github.base_ref == 'develop' && 'DEV') }}
