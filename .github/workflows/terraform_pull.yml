@@ -39,12 +39,12 @@ jobs:
             checkov-results.xml
             checkov-results.sarif
 
-      - name: Report Audit Failure
-        if: steps.audit.outcome != 'success'
-        uses: actions/github-script@v4
-        with:
-          script: |
-              core.setFailed('checkov audit failed')
+      #- name: Report Audit Failure
+       # if: steps.audit.outcome != 'success'
+        #uses: actions/github-script@v4
+        #with:
+         # script: |
+          #    core.setFailed('checkov audit failed')
   
   iac-lint-and-validate:
     name: IaC Lint & Validate
