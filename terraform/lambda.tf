@@ -10,7 +10,8 @@ resource "aws_lambda_function" "s3_audit_lambda" {
 
   environment {
     variables = {
-      "ENVIRONMENT" = var.env
+      "ENVIRONMENT"       = var.env,
+      "DYNAMO_TABLE_NAME" = "${var.env}_s3_audit_table"
     }
 
   }
