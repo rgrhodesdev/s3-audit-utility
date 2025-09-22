@@ -10,7 +10,7 @@ permissions:
 jobs:
 
   build-and-upload:
-    name: Code Upload
+    name: Build and Deploy
     runs-on: ubuntu-latest
     concurrency:
       group: "${{ github.repository }}-${{ github.ref_name }}"
