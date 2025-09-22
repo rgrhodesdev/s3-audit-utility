@@ -11,7 +11,7 @@ resource "aws_iam_policy" "s3_audit_policy" {
         Action = [
           "s3:ListAllMyBuckets",
           "s3:GetBucketPolicy",
-          "s3:GetPublicAccessBlock"
+          "s3:GetBucketPublicAccessBlock"
         ]
         Resource = "*"
       },

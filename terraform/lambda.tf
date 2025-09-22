@@ -5,6 +5,7 @@ resource "aws_lambda_function" "s3_audit_lambda" {
   handler       = "s3-audit.handler"
   role          = aws_iam_role.s3_audit_role.arn
   runtime       = "nodejs22.x"
+  timeout       = 5
 
   publish = true
 
